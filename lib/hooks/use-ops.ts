@@ -11,6 +11,45 @@ export function useSupportCalls(q: SupportCallsQuery) {
   return useQuery({ queryKey: qk.supportCalls(env, q), queryFn: () => api.supportCalls(env, q), placeholderData: keepPreviousData });
 }
 
+/** Team addresses emailed when a patient books a support call. */
+export function useNotifyRecipients() {
+  const { env } = useEnv();
+  return useQuery({ queryKey: qk.notifyRecipients(env), queryFn: () => api.notifyRecipients(env) });
+}
+
+export function useAddNotifyRecipient() {
+  const { env } = useEnv();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (email: string) => api.addNotifyRecipient(env, email),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.notifyRecipients(env) });
+      void qc.invalidateQueries({ queryKey: qk.audit(env) });
+    },
+  });
+}
+
+export function useRemoveNotifyRecipient() {
+  const { env } = useEnv();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.removeNotifyRecipient(env, id),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.notifyRecipients(env) });
+      void qc.invalidateQueries({ queryKey: qk.audit(env) });
+    },
+  });
+}
+
+export function useTestNotifyRecipients() {
+  const { env } = useEnv();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.testNotifyRecipients(env),
+    onSettled: () => qc.invalidateQueries({ queryKey: qk.audit(env) }),
+  });
+}
+
 export function useAuditLog(q: AuditQuery) {
   const { env } = useEnv();
   return useQuery({ queryKey: qk.auditList(env, q), queryFn: () => api.auditLog(env, q), placeholderData: keepPreviousData });

@@ -216,6 +216,18 @@ export interface PushResult {
 }
 
 // ─── Support calls ────────────────────────────────────────────────────────────
+/** A team address emailed when a patient books a support call. */
+export interface NotifyRecipient {
+  id: string;
+  email: string;
+  created_at: string;
+}
+
+export interface NotifyTestResult {
+  sent_to: number;
+  sender: string;
+}
+
 export interface SupportCallRow {
   id: string;
   user_id: string;

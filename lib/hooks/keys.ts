@@ -10,6 +10,7 @@ export const qk = {
   user: (env: Env, id: string) => [env, "app-users", "detail", id] as const,
   purgePreview: (env: Env, id: string) => [env, "app-users", "purge-preview", id] as const,
   supportCalls: (env: Env, q: object) => [env, "support-calls", q] as const,
+  notifyRecipients: (env: Env) => [env, "support-call-notify-recipients"] as const,
   audit: (env: Env) => [env, "audit-log"] as const,
   auditList: (env: Env, q: object) => [env, "audit-log", q] as const,
   systemOverview: (env: Env) => [env, "system", "overview"] as const,

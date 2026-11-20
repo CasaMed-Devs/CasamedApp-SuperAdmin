@@ -35,13 +35,14 @@ export default function LoginPage() {
       await signInWithGoogle();
     } catch (e) {
       const code = (e as { code?: string })?.code ?? "";
+      console.error("Sign-in error:", e);
       if (code !== "auth/popup-closed-by-user" && code !== "auth/cancelled-popup-request") {
         setNotice(
           code === "auth/unauthorized-domain"
             ? "This domain is not authorised in Firebase. Add it under Authentication → Settings → Authorized domains."
             : code === "auth/popup-blocked"
               ? "Your browser blocked the sign-in popup. Allow popups for this site and try again."
-              : "Sign-in failed. Please try again.",
+              : `Sign-in failed${code ? ` (${code})` : ""}. Please try again.`,
         );
       }
     } finally {

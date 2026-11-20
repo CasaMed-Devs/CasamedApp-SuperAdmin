@@ -8,9 +8,11 @@ import { Card, Input, Label } from "@/components/ui/primitives";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/menus";
 import { EmptyState, ErrorState, PageHeader, Pagination, TableSkeleton } from "@/components/common";
 import { SupportCallsTable } from "@/components/users/support-calls-table";
+import { NotifyRecipientsCard } from "@/components/support-calls/notify-recipients-card";
 
 const LIMIT = 25;
-const STATUSES = ["scheduled", "completed", "cancelled", "no_show"];
+// The values the backend accepts (GET /admin/support-calls?status=).
+const STATUSES = ["booked", "cancelled"];
 
 export default function SupportCallsPage() {
   const [status, setStatus] = useState("all");
@@ -23,6 +25,7 @@ export default function SupportCallsPage() {
   return (
     <>
       <PageHeader title="Support calls" description="Onboarding and help calls booked from the app." />
+      <NotifyRecipientsCard />
       <Card className="overflow-hidden">
         <div className="flex flex-wrap items-end gap-3 border-b p-3">
           <div className="grid gap-1.5">

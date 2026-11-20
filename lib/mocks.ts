@@ -17,6 +17,7 @@ import type {
   GaitResult,
   MembershipHistoryRow,
   MembershipSummary,
+  NotifyRecipient,
   Paged,
   PaymentRow,
   PostureReport,
@@ -174,6 +175,7 @@ function buildPatients(): MockPatient[] {
 
 // ─── In-memory store ──────────────────────────────────────────────────────────
 let patients: MockPatient[] | null = null;
+let notifyRecipients: NotifyRecipient[] = [];
 const store = () => (patients ??= buildPatients());
 
 const audit: AuditRow[] = (() => {
@@ -550,6 +552,22 @@ export async function mockRequest<T>(
     return { recipients, sent: recipients - failed, failed } as T;
   }
   if (route === "GET monolith:api/v2/admin/support-calls") return supportCalls(query) as T;
+  if (route === "GET monolith:api/v2/admin/support-calls/notify-recipients") return [...notifyRecipients] as T;
+  if (route === "POST monolith:api/v2/admin/support-calls/notify-recipients") {
+    const email = String(b.email ?? "").trim().toLowerCase();
+    if (notifyRecipients.some((r) => r.email === email)) throw new ApiError(409, "This email is already on the list");
+    const row = { id: `nr_${Date.now()}`, email, created_at: new Date().toISOString() };
+    notifyRecipients.push(row);
+    return row as T;
+  }
+  if ((mt = /^DELETE monolith:api\/v2\/admin\/support-calls\/notify-recipients\/([^/]+)$/.exec(route))) {
+    notifyRecipients = notifyRecipients.filter((r) => r.id !== mt![1]);
+    return null as T;
+  }
+  if (route === "POST monolith:api/v2/admin/support-calls/notify-recipients/test") {
+    if (!notifyRecipients.length) throw new ApiError(422, "Add at least one email first");
+    return { sent_to: notifyRecipients.length, sender: "CasaMed Support <animesh.yadav@casamed.in>" } as T;
+  }
   if (route === "GET monolith:api/v2/admin/audit-log") return auditLog(query) as T;
   if (route === "GET monolith:api/v2/admin/system/status") return systemStatus("monolith", env) as T;
   if (route === "GET posture:api/post_det/v1/admin/status") return systemStatus("posture", env) as T;

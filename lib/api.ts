@@ -23,6 +23,8 @@ import type {
   GaitResult,
   GrantBody,
   MembershipSummary,
+  NotifyRecipient,
+  NotifyTestResult,
   Paged,
   PostureReport,
   PostureSessions,
@@ -159,6 +161,13 @@ export const api = {
     m(env).send<PurgeResult>("DELETE", `admin/app-users/${encodeURIComponent(id)}`, undefined, { confirm }),
   push: (env: Env, body: PushBody) => m(env).send<PushResult>("POST", "admin/push", body),
   supportCalls: (env: Env, q: SupportCallsQuery) => m(env).get<Paged<SupportCallRow>>("admin/support-calls", { ...q }),
+  notifyRecipients: (env: Env) => m(env).get<NotifyRecipient[]>("admin/support-calls/notify-recipients"),
+  addNotifyRecipient: (env: Env, email: string) =>
+    m(env).send<NotifyRecipient>("POST", "admin/support-calls/notify-recipients", { email }),
+  removeNotifyRecipient: (env: Env, id: string) =>
+    m(env).send<null>("DELETE", `admin/support-calls/notify-recipients/${encodeURIComponent(id)}`),
+  testNotifyRecipients: (env: Env) =>
+    m(env).send<NotifyTestResult>("POST", "admin/support-calls/notify-recipients/test"),
   auditLog: (env: Env, q: AuditQuery) => m(env).get<Paged<AuditRow>>("admin/audit-log", { ...q }),
 
   // Per-service key/status checks (same shape everywhere).
